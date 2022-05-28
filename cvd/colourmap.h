@@ -30,9 +30,9 @@ namespace Internal
 		if(d < 1. / 3.)
 			return Rgb<float>(d * 3, 0, 0);
 		else if(d < 2. / 3.)
-			return Rgb<float>(1, (d - 1. / 3.) * 3, 0);
+			return Rgb<float>(1, (d - 1.f / 3.f) * 3, 0);
 		else
-			return Rgb<float>(1, 1, (d - 2. / 3.) * 3);
+			return Rgb<float>(1, 1, (d - 2.f / 3.f) * 3);
 	}
 
 	Rgb<float> jet(float d)
@@ -40,30 +40,30 @@ namespace Internal
 		using std::max;
 		using std::min;
 		d = max(0.f, min(d, 1.0f));
-		double r = 0, g = 0, b = 0;
+		float r = 0, g = 0, b = 0;
 
-		if(d < 1. / 4.) // Red to yello
+		if(d < 1.f / 4.f) // Red to yello
 		{
 			r = 1;
-			g = d / (1. / 4.);
+			g = d / (1.f / 4.f);
 			b = 0;
 		}
-		else if(d < 2. / 4.) //Yello to green
+		else if(d < 2.f / 4.f) //Yello to green
 		{
 			g = 1;
-			r = 1 - (d - 1. / 4.) / (1. / 4.);
+			r = 1 - (d - 1.f / 4.f) / (1.f / 4.f);
 			b = 0;
 		}
-		else if(d < 3. / 4.) // Green to cyan
+		else if(d < 3.f / 4.f) // Green to cyan
 		{
 			r = 0;
 			g = 1;
-			b = (d - 2. / 4.) / (1. / 4.);
+			b = (d - 2.f / 4.f) / (1.f / 4.f);
 		}
 		else //cyan to blue
 		{
 			b = 1;
-			g = 1 - (d - 3. / 4.) / (1. / 4.);
+			g = 1 - (d - 3.f / 4.f) / (1.f / 4.f);
 			r = 0;
 		}
 
@@ -75,10 +75,10 @@ namespace Internal
 		using std::max;
 		using std::min;
 
-		if(d < 1. / 2.)
+		if(d < 1.f / 2.f)
 			return Rgb<float>(1 - d * 2, 0, 0);
 		else
-			return Rgb<float>(0, (d - 1. / 2.) * 2, 0);
+			return Rgb<float>(0, (d - 1.f / 2.f) * 2, 0);
 	}
 
 	template <class C, class D>
@@ -106,18 +106,18 @@ struct Colourmap<Rgb<C>>
 
 	///Glow/Hot colourscale (red-yellow-white)
 	///@param d Value in \f$[0, 1)\f$ to map
-	static Rgb<C> hot(double d) { return Internal::conv<C>(Internal::hot, d); }
+	static Rgb<C> hot(double d) { return Internal::conv<C>(Internal::hot, static_cast<float>(d)); }
 
 	///Jet colourscale (red-yellow-green-cyan-blue)
 	///@param d Value in \f$[0, 1)\f$ to map
-	static Rgb<C> jet(double d) { return Internal::conv<C>(Internal::jet, d); }
+	static Rgb<C> jet(double d) { return Internal::conv<C>(Internal::jet, static_cast<float>(d)); }
 
 	///Green-black-red colourscale
 	///@param d Value in \f$[0, 1)\f$ to map
-	static Rgb<C> gkr(double d) { return Internal::conv<C>(Internal::gkr, d); }
+	static Rgb<C> gkr(double d) { return Internal::conv<C>(Internal::gkr, static_cast<float>(d)); }
 	///Gray colourscale
 	///@param d Value in \f$[0, 1)\f$ to map
-	static Rgb<C> grey(double d) { return Internal::conv<C>(Internal::grey, d); }
+	static Rgb<C> grey(double d) { return Internal::conv<C>(Internal::grey, static_cast<float>(d)); }
 };
 
 ///@example colourmaps.cc

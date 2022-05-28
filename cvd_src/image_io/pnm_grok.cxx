@@ -136,6 +136,11 @@ namespace PNM
 	{
 		public:
 		pnm_in(std::istream&);
+		pnm_in(const pnm_in&) = delete;
+		pnm_in(pnm_in&&) = delete;
+		pnm_in& operator=(const pnm_in&) = delete;
+		pnm_in& operator=(pnm_in&&) = delete;
+
 		ImageRef size();
 		string datatype();
 
@@ -220,17 +225,6 @@ namespace PNM
 
 	void pnm_in::read_header()
 	{
-		//Fix the stream before returning.
-#define RETURN(X)                                                      \
-	do                                                                 \
-	{                                                                  \
-		i >> skipws;                                                   \
-		if(X == E_NONE)                                                \
-			return;                                                    \
-		else                                                           \
-			throw Exceptions::Image_IO::MalformedImage(name_error(X)); \
-	} while(0)
-
 #define CLEAN                                                               \
 	do                                                                      \
 	{                                                                       \
@@ -249,21 +243,33 @@ namespace PNM
 
 		char c1, c2;
 
+		struct ResetSkipWS {
+			ResetSkipWS(std::istream& stream) : stream(stream) {}
+			~ResetSkipWS() { stream >> skipws; }
+			ResetSkipWS(const ResetSkipWS&) = delete;
+			ResetSkipWS(ResetSkipWS&&) = delete;
+			ResetSkipWS& operator=(const ResetSkipWS&) = delete;
+			ResetSkipWS& operator=(ResetSkipWS&&) = delete;
+		
+			std::istream& stream;
+		};
+
 		// i >> (int) will eat whitespace before and after the integer. This breaks
 		// reading maxval since it can (and does) eat in to the image.
 		i >> noskipws;
+		ResetSkipWS reset(i);
 
 		//Read and check magic number
 
 		i >> c1 >> c2;
 		if(i.eof())
-			RETURN(E_HEOF);
+			throw Exceptions::Image_IO::MalformedImage(name_error(E_HEOF));
 
 		if(c1 != 'P' || c2 < '1' || c2 > '7')
-			RETURN(E_NOT_PNM);
+			throw Exceptions::Image_IO::MalformedImage(name_error(E_NOT_PNM));
 
 		if(c2 == '7')
-			RETURN(E_PAM_NOT_IMPLEMENTED);
+			throw Exceptions::Image_IO::MalformedImage(name_error(E_PAM_NOT_IMPLEMENTED));
 
 		if(strchr("123", c2))
 			is_text = true;
@@ -287,7 +293,7 @@ namespace PNM
 		GET(ys);
 
 		if(xs <= 0 || ys <= 0)
-			RETURN(E_BAD_SIZE);
+			throw Exceptions::Image_IO::MalformedImage(name_error(E_BAD_SIZE));
 
 		//Read if necessasy and set MAXVAL
 		if(type != PBM)
@@ -295,7 +301,7 @@ namespace PNM
 			GET(maxval);
 
 			if(maxval <= 0 || maxval > 65535)
-				RETURN(E_BAD_MAXVAL);
+				throw Exceptions::Image_IO::MalformedImage(name_error(E_BAD_MAXVAL));
 
 			if(maxval <= 255)
 				m_is_2_byte = false;
@@ -335,18 +341,9 @@ namespace PNM
 			unsigned char tmp;
 			i >> tmp;
 			if(!isspace(tmp))
-				RETURN(E_UNTERMINATED_HEADER);
+				throw Exceptions::Image_IO::MalformedImage(name_error(E_UNTERMINATED_HEADER));
 		}
 
-		//hee hee hee. This makes the SGI compiler segfault :-)
-		//	RETURN(E_NONE);
-		i >> skipws;
-
-		//HACK
-		//cerr << "is_rgb=" << m_is_rgb <<". xsize=" << xs << ". ysize=" << ys << ". is_text=" << is_text << ". type=" << type  << ". maxval=" << maxval << endl;
-
-		return;
-#undef RETURN
 #undef CLEAN
 #undef GET
 	}
@@ -513,6 +510,10 @@ namespace PNM
 		public:
 		pnm_writer(std::ostream&, ImageRef size, const std::string& type, const std::map<std::string, Parameter<>>& p);
 		~pnm_writer();
+		pnm_writer(const pnm_writer&) = delete;
+		pnm_writer(pnm_writer&&) = delete;
+		pnm_writer& operator=(const pnm_writer&) = delete;
+		pnm_writer& operator=(pnm_writer&&) = delete;
 
 		//void write_raw_pixel_line(const bool*);
 		template <class C>

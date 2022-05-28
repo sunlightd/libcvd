@@ -66,28 +66,25 @@ class SimpleTimer
 	/// @param output Whether or not to output timing information. Default is true.
 	/// @param out std::ostream to send output information to. Default std::cout.
 	SimpleTimer(const std::string& description, const int& cycles_to_time = 1, bool output = true, std::ostream& out = std::cout)
-	    : output_info(output)
+	    : text(description)
+	    , sout(out)
 	    , max(0)
 	    , min(0)
 	    , average(0)
-	    , text(description)
-	    , period(cycles_to_time)
 	    , increment(0)
-	    , timings(0)
 	    , cumulative_time(0)
 	    , time_at_start_of_timing(0)
+	    , timings(0)
+	    , period(cycles_to_time)
+	    , output_info(output)
 	    , timing_started(false)
-	    , sout(out)
 	{
 		assert(period > 0);
-		internal_cvd_timer = new cvd_timer();
 	}
-
-	/// Destructor. Deletes the internal cvd_timer
-	~SimpleTimer()
-	{
-		delete internal_cvd_timer;
-	}
+	SimpleTimer(const SimpleTimer&) = delete;
+	SimpleTimer(SimpleTimer&&) = delete;
+	SimpleTimer& operator=(const SimpleTimer&) = delete;
+	SimpleTimer& operator=(SimpleTimer&&) = delete;
 
 	/// Begin or end a timing cycle. Automatically calls print() when cycles_to_time cycles are reached.
 	void click()
@@ -95,11 +92,11 @@ class SimpleTimer
 		if(!timing_started)
 		{
 			timing_started = true;
-			time_at_start_of_timing = internal_cvd_timer->get_time();
+			time_at_start_of_timing = internal_cvd_timer.get_time();
 		}
 		else if(timing_started)
 		{
-			increment = internal_cvd_timer->get_time() - time_at_start_of_timing;
+			increment = internal_cvd_timer.get_time() - time_at_start_of_timing;
 			time_buffer.push_back(increment);
 			if((int)time_buffer.size() > period && period > 0)
 				time_buffer.pop_front();
@@ -132,7 +129,7 @@ class SimpleTimer
 		if(time_buffer.size() > 0)
 			max = time_buffer[0];
 		if(time_buffer.size() > 1)
-			for(int i = 0; i < (int)time_buffer.size(); ++i)
+			for(size_t i = 0; i < time_buffer.size(); ++i)
 				max = std::max(time_buffer[i], max);
 
 		return max;
@@ -145,7 +142,7 @@ class SimpleTimer
 		if(time_buffer.size() > 0)
 			min = time_buffer[0];
 		if(time_buffer.size() > 1)
-			for(int i = 0; i < (int)time_buffer.size(); ++i)
+			for(size_t i = 0; i < time_buffer.size(); ++i)
 				min = std::min(time_buffer[i], min);
 		return min;
 	}
@@ -157,7 +154,7 @@ class SimpleTimer
 		if(time_buffer.size() > 0)
 		{
 			cumulative_time = 0;
-			for(int i = 0; i < (int)time_buffer.size(); ++i)
+			for(size_t i = 0; i < time_buffer.size(); ++i)
 				cumulative_time += time_buffer[i];
 			average = cumulative_time / static_cast<double>(time_buffer.size());
 		}
@@ -165,18 +162,18 @@ class SimpleTimer
 	}
 
 	private:
-	bool output_info;
-	double max, min, average;
 	std::string text;
-	int period;
-	double increment;
-	int timings;
-	double cumulative_time;
-	double time_at_start_of_timing;
-	bool timing_started;
-	cvd_timer* internal_cvd_timer;
+	cvd_timer internal_cvd_timer;
 	std::ostream& sout;
 	std::deque<double> time_buffer;
+	double max, min, average;
+	double increment;
+	double cumulative_time;
+	double time_at_start_of_timing;
+	int timings;
+	int period;
+	bool output_info;
+	bool timing_started;
 };
 
 }

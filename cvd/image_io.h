@@ -204,6 +204,10 @@ namespace Internal
 		    : i(is)
 		{
 		}
+		ImagePromise(const ImagePromise&) = delete;
+		ImagePromise(ImagePromise&&) = delete;
+		ImagePromise& operator=(const ImagePromise&) = delete;
+		ImagePromise& operator=(ImagePromise&&) = delete;
 
 		std::istream& i;
 		template <class C>
@@ -225,6 +229,10 @@ namespace Internal
 		    : s(ss)
 		{
 		}
+		ImagePromise(const ImagePromise&) = delete;
+		ImagePromise(ImagePromise&&) = delete;
+		ImagePromise& operator=(const ImagePromise&) = delete;
+		ImagePromise& operator=(ImagePromise&&) = delete;
 
 		const std::string& s;
 		template <class C>
@@ -288,31 +296,31 @@ void img_save(const BasicImage<PixelType>& im, std::ostream& o, ImageType::Image
 			Internal::writeImage<PixelType, PNM::Writer>(im, o, p);
 			break;
 		case ImageType::JPEG:
-			Internal::writeImage<PixelType, JPEG::writer>(im, o, p);
+			Internal::writeImage<PixelType, JPEG::Writer>(im, o, p);
 			break;
 		case ImageType::PNG:
-			Internal::writeImage<PixelType, PNG::png_writer>(im, o, p);
+			Internal::writeImage<PixelType, PNG::Writer>(im, o, p);
 			break;
 		case ImageType::TIFF:
-			Internal::writeImage<PixelType, TIFF::tiff_writer>(im, o, p);
+			Internal::writeImage<PixelType, TIFF::Writer>(im, o, p);
 			break;
 		case ImageType::FITS:
-			Internal::writeImage<PixelType, FITS::writer>(im, o, p);
+			Internal::writeImage<PixelType, FITS::Writer>(im, o, p);
 			break;
 		case ImageType::BMP:
 			Internal::writeImage<PixelType, BMP::Writer>(im, o, p);
 			break;
 		case ImageType::TXT:
-			Internal::writeImage<PixelType, TEXT::writer>(im, o, p);
+			Internal::writeImage<PixelType, TEXT::Writer>(im, o, p);
 			break;
 		case ImageType::PS:
-			Internal::writeImage<PixelType, PS::writer>(im, o, p);
+			Internal::writeImage<PixelType, PS::Writer>(im, o, p);
 			break;
 		case ImageType::EPS:
 			Internal::writeImage<PixelType, PS::eps_writer>(im, o, p);
 			break;
 		case ImageType::CVD:
-			Internal::writeImage<PixelType, CVDimage::writer>(im, o, p);
+			Internal::writeImage<PixelType, CVDimage::Writer>(im, o, p);
 			break;
 	}
 }

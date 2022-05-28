@@ -74,10 +74,10 @@ inline void nonmax_suppression_t(const vector<ImageRef>& corners, const vector<S
 			for(; corners[point_above].y < pos.y && corners[point_above].x < pos.x - 1; point_above++)
 			{ }
 
-			for(int i = point_above; corners[i].y < pos.y && corners[i].x <= pos.x + 1; i++)
+			for(int j = point_above; corners[j].y < pos.y && corners[j].x <= pos.x + 1; j++)
 			{
-				int x = corners[i].x;
-				if((x == pos.x - 1 || x == pos.x || x == pos.x + 1) && Test::Compare(scores[i], score))
+				int x = corners[j].x;
+				if((x == pos.x - 1 || x == pos.x || x == pos.x + 1) && Test::Compare(scores[j], score))
 					goto cont;
 			}
 		}
@@ -93,10 +93,10 @@ inline void nonmax_suppression_t(const vector<ImageRef>& corners, const vector<S
 			for(; point_below < sz && corners[point_below].y == pos.y + 1 && corners[point_below].x < pos.x - 1; point_below++)
 			{ }
 
-			for(int i = point_below; i < sz && corners[i].y == pos.y + 1 && corners[i].x <= pos.x + 1; i++)
+			for(int j = point_below; j < sz && corners[j].y == pos.y + 1 && corners[j].x <= pos.x + 1; j++)
 			{
-				int x = corners[i].x;
-				if((x == pos.x - 1 || x == pos.x || x == pos.x + 1) && Test::Compare(scores[i], score))
+				int x = corners[j].x;
+				if((x == pos.x - 1 || x == pos.x || x == pos.x + 1) && Test::Compare(scores[j], score))
 					goto cont;
 			}
 		}

@@ -100,6 +100,10 @@ namespace VFB
 		/// @param is_rgb Is RGB data wanted?
 		RawVideoFileBuffer(const std::string& file, const std::string& formatname, bool is_rgb, bool verbose, const std::map<std::string, std::string>&);
 		~RawVideoFileBuffer();
+		RawVideoFileBuffer(const RawVideoFileBuffer&) = delete;
+		RawVideoFileBuffer(RawVideoFileBuffer&&) = delete;
+		RawVideoFileBuffer& operator=(const RawVideoFileBuffer&) = delete;
+		RawVideoFileBuffer& operator=(RawVideoFileBuffer&&) = delete;
 
 		/// The size of the VideoFrames returned by this buffer
 		ImageRef size();

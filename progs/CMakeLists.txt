@@ -1,6 +1,6 @@
 project(progs)
 
-if(CVD_HAVE_GLWINDOW)
+if(CVD_HAVE_GLWINDOW AND CVD_HAVE_FFMPEG)
 	add_executable(video_play_source video_play_source.cc)
 	target_link_libraries(video_play_source PRIVATE CVD)
 	install(TARGETS video_play_source RUNTIME DESTINATION bin)

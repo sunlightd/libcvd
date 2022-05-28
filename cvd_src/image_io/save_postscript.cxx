@@ -59,9 +59,13 @@ namespace PS
 	{
 		public:
 		WritePimpl(std::ostream&, ImageRef size, const string& type, const string& extra_header = "");
+		~WritePimpl();
+		WritePimpl(const WritePimpl&) = delete;
+		WritePimpl(WritePimpl&&) = delete;
+		WritePimpl& operator=(const WritePimpl&) = delete;
+		WritePimpl& operator=(WritePimpl&&) = delete;
 
 		void write_raw_pixel_lines(const unsigned char*, int);
-		~WritePimpl();
 		int channels() { return m_channels; }
 		long x_size() const { return xs; }
 		long y_size() const { return ys; }
@@ -193,21 +197,21 @@ namespace PS
 	// Public interfaces to image writing.
 	//
 
-	writer::writer(ostream& o, ImageRef size, const string& s, const map<string, Parameter<>>&)
+	Writer::Writer(ostream& o, ImageRef size, const string& s, const map<string, Parameter<>>&)
 	    : t(new WritePimpl(o, size, s))
 	{
 	}
 
-	writer::~writer()
+	Writer::~Writer()
 	{
 	}
 
-	void writer::write_raw_pixel_line(const byte* data)
+	void Writer::write_raw_pixel_line(const byte* data)
 	{
 		t->write_raw_pixel_lines(data, 1);
 	}
 
-	void writer::write_raw_pixel_line(const Rgb<byte>* data)
+	void Writer::write_raw_pixel_line(const Rgb<byte>* data)
 	{
 		t->write_raw_pixel_lines((byte*)data, 1);
 	}

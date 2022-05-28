@@ -26,6 +26,10 @@ namespace CVDimage
 		public:
 		Reader(std::istream&);
 		~Reader();
+		Reader(const Reader&) = delete;
+		Reader(Reader&&) = delete;
+		Reader& operator=(const Reader&) = delete;
+		Reader& operator=(Reader&&) = delete;
 
 		ImageRef size();
 		bool top_row_first();
@@ -62,11 +66,15 @@ namespace CVDimage
 
 	class WritePimpl;
 
-	class writer
+	class Writer
 	{
 		public:
-		writer(std::ostream&, ImageRef size, const std::string& type, const std::map<std::string, Parameter<>>& p);
-		~writer();
+		Writer(std::ostream&, ImageRef size, const std::string& type, const std::map<std::string, Parameter<>>& p);
+		~Writer();
+		Writer(const Writer&) = delete;
+		Writer(Writer&&) = delete;
+		Writer& operator=(const Writer&) = delete;
+		Writer& operator=(Writer&&) = delete;
 
 		void write_raw_pixel_line(const byte*);
 		void write_raw_pixel_line(const bayer_bggr*);
@@ -89,43 +97,43 @@ namespace CVDimage
 	};
 
 	template <>
-	struct writer::Outgoing<bayer_bggr>
+	struct Writer::Outgoing<bayer_bggr>
 	{
 		typedef bayer_bggr type;
 	};
 
 	template <>
-	struct writer::Outgoing<bayer_rggb>
+	struct Writer::Outgoing<bayer_rggb>
 	{
 		typedef bayer_rggb type;
 	};
 
 	template <>
-	struct writer::Outgoing<bayer_grbg>
+	struct Writer::Outgoing<bayer_grbg>
 	{
 		typedef bayer_grbg type;
 	};
 
 	template <>
-	struct writer::Outgoing<bayer_gbrg>
+	struct Writer::Outgoing<bayer_gbrg>
 	{
 		typedef bayer_gbrg type;
 	};
 
 	template <class C>
-	struct writer::Outgoing<Rgb<C>>
+	struct Writer::Outgoing<Rgb<C>>
 	{
 		typedef Rgb<byte> type;
 	};
 
 	template <class C>
-	struct writer::Outgoing<Rgba<C>>
+	struct Writer::Outgoing<Rgba<C>>
 	{
 		typedef Rgba<byte> type;
 	};
 
 	template <>
-	struct writer::Outgoing<Rgb8>
+	struct Writer::Outgoing<Rgb8>
 	{
 		typedef Rgb<byte> type;
 	};

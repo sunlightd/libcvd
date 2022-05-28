@@ -22,10 +22,10 @@ class CVD::TEXT::WritePimpl
 		if(t != "double" && t != "float")
 			throw UnsupportedImageSubType("TEXT", t);
 	}
-
-	~WritePimpl()
-	{
-	}
+	WritePimpl(const WritePimpl&) = delete;
+	WritePimpl(WritePimpl&&) = delete;
+	WritePimpl& operator=(const WritePimpl&) = delete;
+	WritePimpl& operator=(WritePimpl&&) = delete;
 
 	void write_raw_pixel_line(const double* d)
 	{
@@ -64,21 +64,21 @@ class CVD::TEXT::WritePimpl
 	unsigned long row;
 };
 
-TEXT::writer::writer(ostream& o, ImageRef size, const string& type, const std::map<std::string, Parameter<>>&)
+TEXT::Writer::Writer(ostream& o, ImageRef size, const string& type, const std::map<std::string, Parameter<>>&)
     : t(new WritePimpl(o, size, type))
 {
 }
 
-TEXT::writer::~writer()
+TEXT::Writer::~Writer()
 {
 }
 
-void TEXT::writer::write_raw_pixel_line(const double* d)
+void TEXT::Writer::write_raw_pixel_line(const double* d)
 {
 	t->write_raw_pixel_line(d);
 }
 
-void TEXT::writer::write_raw_pixel_line(const float* d)
+void TEXT::Writer::write_raw_pixel_line(const float* d)
 {
 	t->write_raw_pixel_line(d);
 }

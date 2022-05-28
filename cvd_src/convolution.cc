@@ -311,27 +311,27 @@ void van_vliet_blur(const double b[], const CVD::BasicImage<float> in, CVD::Basi
 	{
 		double y3, y2, y1;
 
-		const float* in = out[h - 1] + i;
-		y3 = y2 = y1 = inv_alpha * *in;
+		const float* inp = out[h - 1] + i;
+		y3 = y2 = y1 = inv_alpha * *inp;
 
-		for(int j = h - 1; j - 3 >= 0; j -= 4, in -= stride)
+		for(int j = h - 1; j - 3 >= 0; j -= 4, inp -= stride)
 		{
-			double y0 = in[0] - (b0 * y1 + b1 * y2 + b2 * y3);
-			in -= stride;
-			y3 = in[0] - (b0 * y0 + b1 * y1 + b2 * y2);
-			in -= stride;
-			y2 = in[0] - (b0 * y3 + b1 * y0 + b2 * y1);
-			in -= stride;
-			y1 = in[0] - (b0 * y2 + b1 * y3 + b2 * y0);
+			double y0 = inp[0] - (b0 * y1 + b1 * y2 + b2 * y3);
+			inp -= stride;
+			y3 = inp[0] - (b0 * y0 + b1 * y1 + b2 * y2);
+			inp -= stride;
+			y2 = inp[0] - (b0 * y3 + b1 * y0 + b2 * y1);
+			inp -= stride;
+			y1 = inp[0] - (b0 * y2 + b1 * y3 + b2 * y0);
 			tmp[j] = y0;
 			tmp[j - 1] = y3;
 			tmp[j - 2] = y2;
 			tmp[j - 3] = y1;
 		}
 
-		for(int j = rh - 1; j >= 0; --j, in -= stride)
+		for(int j = rh - 1; j >= 0; --j, inp -= stride)
 		{
-			double y0 = in[0] - (b0 * y1 + b1 * y2 + b2 * y3);
+			double y0 = inp[0] - (b0 * y1 + b1 * y2 + b2 * y3);
 			tmp[j] = y0;
 			y3 = y2;
 			y2 = y1;
@@ -339,7 +339,7 @@ void van_vliet_blur(const double b[], const CVD::BasicImage<float> in, CVD::Basi
 		}
 
 		{
-			const double i_plus = in[stride];
+			const double i_plus = inp[stride];
 			double y0 = i_plus - (b0 * y1 + b1 * y2 + b2 * y3);
 			y3 = y2;
 			y2 = y1;

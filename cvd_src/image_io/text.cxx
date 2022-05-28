@@ -18,7 +18,11 @@ class CVD::TEXT::ReadPimpl
 {
 	public:
 	ReadPimpl(istream&);
-	~ReadPimpl();
+	ReadPimpl(const ReadPimpl&) = delete;
+	ReadPimpl(ReadPimpl&&) = delete;
+	ReadPimpl& operator=(const ReadPimpl&) = delete;
+	ReadPimpl& operator=(ReadPimpl&&) = delete;
+
 	ImageRef size();
 	string datatype();
 	void get_raw_pixel_line(double* data);
@@ -48,10 +52,6 @@ string ReadPimpl::datatype()
 ImageRef ReadPimpl::size()
 {
 	return my_size;
-}
-
-ReadPimpl::~ReadPimpl()
-{
 }
 
 ReadPimpl::ReadPimpl(istream& is)

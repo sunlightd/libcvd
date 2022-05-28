@@ -37,6 +37,10 @@ namespace BMP
 
 			pad = ((ch * size.x) % 4) ? (4 - ((ch * size.x) % 4)) : 0;
 		}
+		WritePimpl(const WritePimpl&) = delete;
+		WritePimpl(WritePimpl&&) = delete;
+		WritePimpl& operator=(const WritePimpl&) = delete;
+		WritePimpl& operator=(WritePimpl&&) = delete;
 
 		void write_raw_pixel_line(const byte* r)
 		{

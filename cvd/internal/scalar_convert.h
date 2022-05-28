@@ -119,7 +119,7 @@ namespace Pixel
 			{
 				trivial_array<S, 512> table = {};
 				for(int i = 0; i <= 511; i++)
-					table[i] = (S)((i - 255) / 255.0);
+					table[static_cast<size_t>(i)] = (S)((i - 255) / 255.0);
 
 				return table;
 			}
@@ -128,8 +128,8 @@ namespace Pixel
 			constexpr static trivial_array<double, 512> double_for_byte = buildLookupTable<double>();
 		}
 
-		inline float byte_to_float(int b) { return Internal::float_for_byte[b + 255]; }
-		inline double byte_to_double(int b) { return Internal::double_for_byte[b + 255]; }
+		inline float byte_to_float(int b) { return Internal::float_for_byte[static_cast<size_t>(b + 255)]; }
+		inline double byte_to_double(int b) {return Internal::double_for_byte[static_cast<size_t>(b + 255)]; }
 
 		//Convert a "D" to "To" scaled as if we are converting "From" type to a "To" type.
 		//Special code is invoked if both D and To are integral.

@@ -53,7 +53,6 @@ static bool windowClassRegistered = false;
 
 void GLWindow::init(const ImageRef& size, int bpp, const std::string& title, const std::string&)
 {
-	GLuint PixelFormat; // Holds The Results After Searching For A Match
 	WNDCLASS wc; // Windows Class Structure
 	DWORD dwExStyle; // Window Extended Style
 	DWORD dwStyle; // Window Style
@@ -129,8 +128,7 @@ void GLWindow::init(const ImageRef& size, int bpp, const std::string& title, con
 	AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle); // Adjust Window To True Requested Size
 
 	// Create The Window
-	HWND hWnd;
-	if(!(hWnd = CreateWindowEx(dwExStyle, // Extended Style For The Window
+	HWND hWnd = CreateWindowEx(dwExStyle, // Extended Style For The Window
 	         "glwindow", // Class Name
 	         NULL, //title.c_str(),                              // Window Title
 	         dwStyle | // Defined Window Style
@@ -142,7 +140,8 @@ void GLWindow::init(const ImageRef& size, int bpp, const std::string& title, con
 	         NULL, // No Parent Window
 	         NULL, // No Menu
 	         hInstance, // Instance
-	         NULL))) // Dont Pass Anything To WM_CREATE
+	         NULL); // Dont Pass Anything To WM_CREATE
+	if(!hWnd)
 	{
 		throw Exceptions::GLWindow::CreationError("Window Creation Error.");
 	}
@@ -169,18 +168,19 @@ void GLWindow::init(const ImageRef& size, int bpp, const std::string& title, con
 		    0, 0, 0 // Layer Masks Ignored
 	    };
 
-	HDC hDC;
-	if(!(hDC = GetDC(hWnd)))
+	HDC hDC = GetDC(hWnd);
+	if(!hDC)
 		throw Exceptions::GLWindow::CreationError("Can't create a GL Device Context.");
 
-	if(!(PixelFormat = ChoosePixelFormat(hDC, &pfd)))
+	GLuint PixelFormat = ChoosePixelFormat(hDC, &pfd); // Holds The Results After Searching For A Match
+	if(!PixelFormat)
 		throw Exceptions::GLWindow::CreationError("Can't find a suitable PixelFormat.");
 
 	if(!SetPixelFormat(hDC, PixelFormat, &pfd))
 		throw Exceptions::GLWindow::CreationError("Can't Set The PixelFormat.");
 
-	HGLRC hRC;
-	if(!(hRC = wglCreateContext(hDC)))
+	HGLRC hRC = wglCreateContext(hDC);
+	if(!hRC)
 		throw Exceptions::GLWindow::CreationError("Can't Create A GL Rendering Context.");
 
 	if(!wglMakeCurrent(hDC, hRC))
@@ -261,15 +261,11 @@ void closeGLWindow(GLWindow::State* state)
 	if(state->hDC && !ReleaseDC(state->hWnd, state->hDC))
 	{
 		throw Exceptions::GLWindow::RuntimeError("Release Device Context failed.");
-
-		state->hDC = NULL;
 	}
 
 	if(state->hWnd && !DestroyWindow(state->hWnd))
 	{
 		throw Exceptions::GLWindow::RuntimeError("Destroy Window failed.");
-
-		// We don't want to set hWnd to NULL here, as we need it in the destructor to remove state from windowMap.
 	}
 
 #if 0
@@ -329,7 +325,7 @@ void GLWindow::set_position(const ImageRef& p_)
 	MoveWindow(state->hWnd, state->position.x + state->position_offset.x, state->position.y + state->position_offset.y, state->size.x + state->size_offset.x, state->size.y + state->size_offset.y, FALSE);
 }
 
-void GLWindow::set_cursor_position(const ImageRef& where)
+void GLWindow::set_cursor_position(const ImageRef&)
 {
 	// FIXME
 	//XWarpPointer(state->display, None, state->window, 0, 0, 0, 0, where.x, where.y);
@@ -471,10 +467,10 @@ void GLWindow::handle_events(EventHandler& handler)
 				break;
 			case WM_KEYDOWN:
 			{
-				unsigned char state[256];
-				GetKeyboardState(state);
+				unsigned char keyboard_state[256];
+				GetKeyboardState(keyboard_state);
 				char buffer[4];
-				int res = ToAscii((UINT)msg.wParam, (UINT)(msg.lParam & 0xffffff) >> 16, state, (LPWORD)buffer, 0);
+				int res = ToAscii((UINT)msg.wParam, (UINT)(msg.lParam & 0xffffff) >> 16, keyboard_state, (LPWORD)buffer, 0);
 				if(res == 1)
 				{
 					handler.on_key_down(*this, buffer[0]);
@@ -487,10 +483,10 @@ void GLWindow::handle_events(EventHandler& handler)
 			break;
 			case WM_KEYUP:
 			{
-				unsigned char state[256];
-				GetKeyboardState(state);
+				unsigned char keyboard_state[256];
+				GetKeyboardState(keyboard_state);
 				char buffer[4];
-				int res = ToAscii((UINT)msg.wParam, (UINT)(msg.lParam & 0xffffff) >> 16, state, (LPWORD)buffer, 0);
+				int res = ToAscii((UINT)msg.wParam, (UINT)(msg.lParam & 0xffffff) >> 16, keyboard_state, (LPWORD)buffer, 0);
 				if(res == 1)
 				{
 					handler.on_key_up(*this, buffer[0]);
@@ -504,6 +500,7 @@ void GLWindow::handle_events(EventHandler& handler)
 			case WM_PAINT:
 				// This will never be called here, it will always be in WndProc...
 				handler.on_event(*this, EVENT_EXPOSE);
+				[[fallthrough]];
 			default:
 				DispatchMessage(&msg);
 		}
@@ -522,14 +519,19 @@ class SaveEvents : public GLWindow::EventHandler
 	    : events(events_)
 	{
 	}
-	void on_key_down(GLWindow&, int key)
+	SaveEvents(const SaveEvents&) = delete;
+	SaveEvents(SaveEvents&&) = delete;
+	SaveEvents& operator=(const SaveEvents&) = delete;
+	SaveEvents& operator=(SaveEvents&&) = delete;
+
+	void on_key_down(GLWindow&, unsigned int key) override
 	{
 		GLWindow::Event e;
 		e.type = GLWindow::Event::KEY_DOWN;
 		e.which = key;
 		events.push_back(e);
 	}
-	void on_key_up(GLWindow&, int key)
+	void on_key_up(GLWindow&, unsigned int key) override
 	{
 		GLWindow::Event e;
 		e.type = GLWindow::Event::KEY_UP;
@@ -537,7 +539,7 @@ class SaveEvents : public GLWindow::EventHandler
 		events.push_back(e);
 	}
 
-	void on_mouse_move(GLWindow&, ImageRef where, int state)
+	void on_mouse_move(GLWindow&, ImageRef where, unsigned int state) override
 	{
 		GLWindow::Event e;
 		e.type = GLWindow::Event::MOUSE_MOVE;
@@ -546,7 +548,7 @@ class SaveEvents : public GLWindow::EventHandler
 		events.push_back(e);
 	}
 
-	void on_mouse_down(GLWindow&, ImageRef where, int state, int button)
+	void on_mouse_down(GLWindow&, ImageRef where, unsigned int state, unsigned int button) override
 	{
 		GLWindow::Event e;
 		e.type = GLWindow::Event::MOUSE_DOWN;
@@ -556,7 +558,7 @@ class SaveEvents : public GLWindow::EventHandler
 		events.push_back(e);
 	}
 
-	void on_mouse_up(GLWindow&, ImageRef where, int state, int button)
+	void on_mouse_up(GLWindow&, ImageRef where, unsigned int state, unsigned int button) override
 	{
 		GLWindow::Event e;
 		e.type = GLWindow::Event::MOUSE_UP;
@@ -566,7 +568,7 @@ class SaveEvents : public GLWindow::EventHandler
 		events.push_back(e);
 	}
 
-	void on_resize(GLWindow&, ImageRef size)
+	void on_resize(GLWindow&, ImageRef size) override
 	{
 		GLWindow::Event e;
 		e.type = GLWindow::Event::RESIZE;
@@ -574,7 +576,7 @@ class SaveEvents : public GLWindow::EventHandler
 		events.push_back(e);
 	}
 
-	void on_event(GLWindow&, int event)
+	void on_event(GLWindow&, unsigned int event) override
 	{
 		GLWindow::Event e;
 		e.type = GLWindow::Event::EVENT;
@@ -604,17 +606,21 @@ class MakeSummary : public GLWindow::EventHandler
 	    : summary(summary_)
 	{
 	}
+	MakeSummary(const MakeSummary&) = delete;
+	MakeSummary(MakeSummary&&) = delete;
+	MakeSummary& operator=(const MakeSummary&) = delete;
+	MakeSummary& operator=(MakeSummary&&) = delete;
 
-	void on_key_down(GLWindow&, int key) { ++summary.key_down[key]; }
-	void on_key_up(GLWindow&, int key) { ++summary.key_up[key]; }
-	void on_mouse_move(GLWindow&, ImageRef where, int)
+	void on_key_down(GLWindow&, unsigned int key) override { ++summary.key_down[key]; }
+	void on_key_up(GLWindow&, unsigned int key) override { ++summary.key_up[key]; }
+	void on_mouse_move(GLWindow&, ImageRef where, unsigned int) override
 	{
 		summary.cursor = where;
 		summary.cursor_moved = true;
 	}
-	void on_mouse_down(GLWindow&, ImageRef where, int state, int button) { summary.mouse_down[button] = std::make_pair(where, state); }
-	void on_mouse_up(GLWindow&, ImageRef where, int state, int button) { summary.mouse_up[button] = std::make_pair(where, state); }
-	void on_event(GLWindow&, int event) { ++summary.events[event]; }
+	void on_mouse_down(GLWindow&, ImageRef where, unsigned int state, unsigned int button) override { summary.mouse_down[button] = std::make_pair(where, state); }
+	void on_mouse_up(GLWindow&, ImageRef where, unsigned int state, unsigned int button) override { summary.mouse_up[button] = std::make_pair(where, state); }
+	void on_event(GLWindow&, unsigned int event) override { ++summary.events[event]; }
 };
 
 void GLWindow::get_events(EventSummary& summary)

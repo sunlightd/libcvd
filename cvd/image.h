@@ -131,19 +131,19 @@ namespace Internal
 	template <>
 	inline void memfill(unsigned char* data, int n, const unsigned char val)
 	{
-		memset(data, val, n);
+		memset(data, val, static_cast<size_t>(n));
 	}
 
 	template <>
 	inline void memfill(signed char* data, int n, const signed char val)
 	{
-		memset(data, val, n);
+		memset(data, val, static_cast<size_t>(n));
 	}
 
 	template <>
 	inline void memfill(char* data, int n, const char val)
 	{
-		memset(data, val, n);
+		memset(data, val, static_cast<size_t>(n));
 	}
 
 	//Detecting a typedef...
@@ -256,6 +256,8 @@ class BasicImageIterator
 	//Prevent automatic conversion from a pointer (ie Image::iterator)
 	explicit BasicImageIterator(T* endptr)
 	    : ptr(endptr)
+	    , row_end(endptr)
+	    , end(endptr)
 	    , is_end(1)
 	    , row_increment(0)
 	    , total_width(0)

@@ -338,18 +338,18 @@ TIFFWritePimpl::TIFFWritePimpl(ostream& os, ImageRef s, const string& t)
 // Implementation of public parts of TIFF reading
 //
 
-tiff_writer::tiff_writer(ostream& o, ImageRef size, const string& type, const std::map<std::string, Parameter<>>&)
+Writer::Writer(ostream& o, ImageRef size, const string& type, const std::map<std::string, Parameter<>>&)
     : t(new TIFFWritePimpl(o, size, type))
 {
 }
 
-tiff_writer::~tiff_writer()
+Writer::~Writer()
 {
 }
 
 //Mechanically generate the pixel reading calls.
 #define GEN1(X) \
-	void tiff_writer::write_raw_pixel_line(const X* d) { t->write_raw_pixel_line(d); }
+	void Writer::write_raw_pixel_line(const X* d) { t->write_raw_pixel_line(d); }
 #define GEN3(X)  \
 	GEN1(X)      \
 	GEN1(Rgb<X>) \

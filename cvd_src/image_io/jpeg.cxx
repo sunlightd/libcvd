@@ -466,21 +466,21 @@ namespace JPEG
 	// Public interfaces to image writing.
 	//
 
-	writer::writer(ostream& o, ImageRef size, const string& s, const std::map<std::string, Parameter<>>& p)
+	Writer::Writer(ostream& o, ImageRef size, const string& s, const std::map<std::string, Parameter<>>& p)
 	    : t(new WritePimpl(o, size.x, size.y, s, p))
 	{
 	}
 
-	writer::~writer()
+	Writer::~Writer()
 	{
 	}
 
-	void writer::write_raw_pixel_line(const byte* data)
+	void Writer::write_raw_pixel_line(const byte* data)
 	{
 		t->write_raw_pixel_line(data);
 	}
 
-	void writer::write_raw_pixel_line(const Rgb<byte>* data)
+	void Writer::write_raw_pixel_line(const Rgb<byte>* data)
 	{
 		t->write_raw_pixel_line(data);
 	}

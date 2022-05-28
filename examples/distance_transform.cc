@@ -41,7 +41,7 @@ int main()
 	for(int y = 0; y < im.size().y; y++)
 		for(int x = 0; x < im.size().x; x++)
 		{
-			int c = floor(sqrt(dt[y][x] * 1.0 / largest_distance) * 255 + .5);
+			int c = static_cast<int>(floor(sqrt(dt[y][x] * 1.0 / largest_distance) * 255 + .5));
 
 			Rgb<byte> r(0, 0, 0);
 			if(im[inverse_dt[y][x]] & 1)

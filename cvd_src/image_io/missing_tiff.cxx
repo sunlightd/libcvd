@@ -14,7 +14,7 @@ namespace
 }
 }
 
-CVD::TIFF::Reader::Reader(std::istream& i)
+CVD::TIFF::Reader::Reader(std::istream&)
 {
 	error();
 }
@@ -61,19 +61,19 @@ class CVD::TIFF::TIFFWritePimpl
 {
 };
 
-CVD::TIFF::tiff_writer::tiff_writer(std::ostream&, ImageRef, const std::string&, const std::map<std::string, Parameter<>>&)
+CVD::TIFF::Writer::Writer(std::ostream&, ImageRef, const std::string&, const std::map<std::string, Parameter<>>&)
 {
 	error();
 }
 
-CVD::TIFF::tiff_writer::~tiff_writer()
+CVD::TIFF::Writer::~Writer()
 {
 }
 
 #undef GEN1
 //Mechanically generate the pixel reading calls.
 #define GEN1(X) \
-	void CVD::TIFF::tiff_writer::write_raw_pixel_line(const X*) { error(); }
+	void CVD::TIFF::Writer::write_raw_pixel_line(const X*) { error(); }
 
 GEN1(bool)
 GEN3(unsigned char)

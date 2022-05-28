@@ -93,6 +93,11 @@ class CVD::FITS::ReadPimpl
 	public:
 	ReadPimpl(istream&);
 	~ReadPimpl();
+	ReadPimpl(const ReadPimpl&) = delete;
+	ReadPimpl(ReadPimpl&&) = delete;
+	ReadPimpl& operator=(const ReadPimpl&) = delete;
+	ReadPimpl& operator=(ReadPimpl&&) = delete;
+
 	ImageRef size();
 	string datatype();
 	template <class C>
@@ -105,7 +110,7 @@ class CVD::FITS::ReadPimpl
 	void convert_raw_pixel_line(unsigned char*, unsigned short* data);
 
 	private:
-	istream& i;
+	istream& stream;
 	unsigned long row;
 	ImageRef my_size;
 	string type;
@@ -122,8 +127,8 @@ class CVD::FITS::ReadPimpl
 
 		if(card == NULL || card == HDU_card_stack + 2880)
 		{
-			i.read(HDU_card_stack, 2880);
-			if(i.eof())
+			stream.read(HDU_card_stack, 2880);
+			if(stream.eof())
 				throw(Exceptions::Image_IO::MalformedImage("EOF in header."));
 
 			card = HDU_card_stack;
@@ -223,7 +228,7 @@ ReadPimpl::~ReadPimpl()
 }
 
 ReadPimpl::ReadPimpl(istream& is)
-    : i(is)
+    : stream(is)
     , row(0)
     , card(NULL)
 {
@@ -331,9 +336,9 @@ ReadPimpl::ReadPimpl(istream& is)
 	vector<unsigned char> raw_data;
 	raw_data.resize(nbytes);
 	data.resize(nbytes);
-	i.read((char*)(&raw_data[0]), nbytes);
+	stream.read((char*)(&raw_data[0]), nbytes);
 
-	if(i.eof())
+	if(stream.eof())
 		throw(Exceptions::Image_IO::MalformedImage("EOF in image."));
 
 		//Make the data follow the native byte ordering
@@ -361,8 +366,8 @@ ReadPimpl::ReadPimpl(istream& is)
 // Implementation of public parts of TIFF reading
 //
 
-Reader::Reader(istream& i)
-    : t(new ReadPimpl(i))
+Reader::Reader(istream& stream)
+    : t(new ReadPimpl(stream))
 {
 }
 

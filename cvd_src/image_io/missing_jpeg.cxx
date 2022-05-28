@@ -58,21 +58,21 @@ class CVD::JPEG::WritePimpl
 {
 };
 
-CVD::JPEG::writer::writer(std::ostream&, ImageRef, const std::string&, const std::map<std::string, Parameter<>>&)
+CVD::JPEG::Writer::Writer(std::ostream&, ImageRef, const std::string&, const std::map<std::string, Parameter<>>&)
 {
 	error();
 }
 
-CVD::JPEG::writer::~writer()
+CVD::JPEG::Writer::~Writer()
 {
 }
 
-void CVD::JPEG::writer::write_raw_pixel_line(const unsigned char*)
+void CVD::JPEG::Writer::write_raw_pixel_line(const unsigned char*)
 {
 	error();
 }
 
-void CVD::JPEG::writer::write_raw_pixel_line(const Rgb<unsigned char>*)
+void CVD::JPEG::Writer::write_raw_pixel_line(const Rgb<unsigned char>*)
 {
 	error();
 }

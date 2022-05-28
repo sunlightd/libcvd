@@ -15,6 +15,11 @@ namespace BMP
 	{
 		public:
 		ReadPimpl(std::istream&);
+		ReadPimpl(const ReadPimpl&) = delete;
+		ReadPimpl(ReadPimpl&&) = delete;
+		ReadPimpl& operator=(const ReadPimpl&) = delete;
+		ReadPimpl& operator=(ReadPimpl&&) = delete;
+
 		ImageRef size() { return s; }
 		void get_raw_pixel_lines(unsigned char*, unsigned long nlines);
 		string datatype()
@@ -26,10 +31,10 @@ namespace BMP
 		{
 			char dummy[4];
 			//Read the data
-			i.read((char*)d, s.x);
+			stream.read((char*)d, s.x);
 
 			//Eat the padding
-			i.read(dummy, rowSize - s.x);
+			stream.read(dummy, rowSize - s.x);
 		}
 
 		void get_raw_pixel_line(Rgb<byte>* d)
@@ -39,13 +44,13 @@ namespace BMP
 			//Depalette image
 			//Not supported
 
-			i.read((char*)d, s.x * 3);
+			stream.read((char*)d, s.x * 3);
 			//Turn bgr into rgb
 			for(int x = 0; x < s.x; x++)
 				swap(d[x].red, d[x].blue);
 
 			//Eat the padding
-			i.read(dummy, rowSize - s.x * 3);
+			stream.read(dummy, rowSize - s.x * 3);
 		}
 
 		template <class T>
@@ -59,7 +64,7 @@ namespace BMP
 
 		private:
 		ImageRef s;
-		std::istream& i;
+		std::istream& stream;
 		string type;
 		int channels;
 		int rowSize;
@@ -68,7 +73,7 @@ namespace BMP
 	};
 
 	ReadPimpl::ReadPimpl(std::istream& in)
-	    : i(in)
+	    : stream(in)
 	{
 		unsigned int w, h, ch, comp;
 		readBMPHeader(w, h, ch, comp, in);

@@ -146,7 +146,7 @@ class Actions : public GLWindow::EventHandler
 		new_recording = 0;
 	}
 
-	virtual void on_key_down(GLWindow&, int key)
+	void on_key_down(GLWindow&, unsigned int key) override
 	{
 		if(key == ' ' || key == 'p')
 			paused = !paused;
@@ -173,7 +173,7 @@ class Actions : public GLWindow::EventHandler
 		}
 	}
 
-	virtual void on_event(GLWindow&, int e)
+	virtual void on_event(GLWindow&, unsigned int e) override
 	{
 		if(e == GLWindow::EVENT_EXPOSE)
 			expose = 1;
@@ -181,7 +181,7 @@ class Actions : public GLWindow::EventHandler
 			quit = 1;
 	}
 
-	virtual void on_resize(GLWindow&, ImageRef size)
+	virtual void on_resize(GLWindow&, ImageRef size) override
 	{
 		glViewport(0, 0, size.x, size.y);
 		glMatrixMode(GL_PROJECTION);
@@ -265,14 +265,15 @@ void play(string s, string fmt, unsigned int decimate)
 #endif
 
 	GLenum texTarget;
-#ifdef GL_TEXTURE_RECTANGLE_ARB
+#if defined(GL_TEXTURE_RECTANGLE)
+	texTarget = GL_TEXTURE_RECTANGLE;
+#elif defined(GL_TEXTURE_RECTANGLE_ARB)
 	texTarget = GL_TEXTURE_RECTANGLE_ARB;
-#else
-#ifdef GL_TEXTURE_RECTANGLE_NV
+#elif defined(GL_TEXTURE_RECTANGLE_NV)
 	texTarget = GL_TEXTURE_RECTANGLE_NV;
 #else
-	texTarget = GL_TEXTURE_RECTANGLE_EXT;
-#endif
+#define GL_TEXTURE_RECTANGLE 0x84F5
+	texTarget = GL_TEXTURE_RECTANGLE;
 #endif
 
 	VideoFrame<C>* frame = 0;
@@ -290,7 +291,7 @@ void play(string s, string fmt, unsigned int decimate)
 
 	string action = "Playing";
 	string rec;
-	bool old_paused = 0;
+	int old_paused = 0;
 
 	int rec_sequence = -1;
 	int rec_number = 0;
@@ -362,7 +363,7 @@ void play(string s, string fmt, unsigned int decimate)
 
 			rec_number++;
 
-			glTexImage2D(*frame, 0, GL_TEXTURE_RECTANGLE_NV);
+			glTexImage2D(*frame, 0, texTarget);
 		}
 
 		if(old_paused != a.paused)

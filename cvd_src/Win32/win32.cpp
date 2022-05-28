@@ -31,7 +31,7 @@ static std::string get_path(const std::string& p)
 	char dir[_MAX_DIR];
 	char out[1024];
 
-	errno_t ret = _splitpath_s(p.c_str(), drive, _MAX_DRIVE, dir, _MAX_DIR, NULL, 0, NULL, 0);
+	[[maybe_unused]] errno_t ret = _splitpath_s(p.c_str(), drive, _MAX_DRIVE, dir, _MAX_DIR, NULL, 0, NULL, 0);
 	assert(0 == ret);
 	_makepath(out, drive, dir, NULL, NULL);
 	return std::string(out);

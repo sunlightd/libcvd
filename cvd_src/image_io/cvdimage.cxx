@@ -295,6 +295,10 @@ namespace CVDimage
 		    : d(aa)
 		{
 		}
+		SortIndex(const SortIndex&) = delete;
+		SortIndex(SortIndex&&) = delete;
+		SortIndex& operator=(const SortIndex&) = delete;
+		SortIndex& operator=(SortIndex&&) = delete;
 
 		bool operator()(int a, int b) const
 		{
@@ -320,20 +324,20 @@ namespace CVDimage
 		{
 			vector<byte> bits;
 
-			Huff* h = terminals[i];
+			Huff* huff = terminals[i];
 
-			int symbol = h->symbol;
+			int symbol = huff->symbol;
 
-			while(h != table)
+			while(huff != table)
 			{
-				Huff* parent = h->parent;
+				Huff* parent = huff->parent;
 
-				if(h == parent->one)
+				if(huff == parent->one)
 					bits.push_back(1);
 				else
 					bits.push_back(0);
 
-				h = h->parent;
+				huff = huff->parent;
 			}
 
 			reverse(bits.begin(), bits.end());
@@ -413,20 +417,20 @@ namespace CVDimage
 		int i = 0;
 		for(Image<byte>::iterator r = ret.begin(); r != ret.end(); r++)
 		{
-			Huff* h = table;
+			Huff* huff = table;
 
-			while(h->one)
+			while(huff->one)
 			{
 				bool bit = b[i / (sizeof(P) * 8)] & ((P)1 << (i % (sizeof(P) * 8)));
 				i++;
 				if(bit)
-					h = h->one;
+					huff = huff->one;
 				else
-					h = h->zero;
+					huff = huff->zero;
 			}
 
-			assert(h->symbol >= 0);
-			*r = static_cast<uint8_t>(h->symbol);
+			assert(huff->symbol >= 0);
+			*r = static_cast<uint8_t>(huff->symbol);
 		}
 	}
 
@@ -715,6 +719,10 @@ namespace CVDimage
 		template <class C>
 		void write_raw_pixel_line(const C*);
 		~WritePimpl();
+		WritePimpl(const WritePimpl&) = delete;
+		WritePimpl(WritePimpl&&) = delete;
+		WritePimpl& operator=(const WritePimpl&) = delete;
+		WritePimpl& operator=(WritePimpl&&) = delete;
 
 		private:
 		void write_header(std::ostream& os);
@@ -916,46 +924,46 @@ namespace CVDimage
 	// Public interfaces to image writing.
 	//
 
-	writer::writer(ostream& o, ImageRef size, const string& s, const std::map<std::string, Parameter<>>&)
+	Writer::Writer(ostream& o, ImageRef size, const string& s, const std::map<std::string, Parameter<>>&)
 	    : t(new WritePimpl(o, size.x, size.y, s))
 	{
 	}
 
-	writer::~writer()
+	Writer::~Writer()
 	{
 	}
 
-	void writer::write_raw_pixel_line(const byte* data)
-	{
-		t->write_raw_pixel_line(data);
-	}
-
-	void writer::write_raw_pixel_line(const bayer_bggr* data)
+	void Writer::write_raw_pixel_line(const byte* data)
 	{
 		t->write_raw_pixel_line(data);
 	}
 
-	void writer::write_raw_pixel_line(const bayer_rggb* data)
+	void Writer::write_raw_pixel_line(const bayer_bggr* data)
 	{
 		t->write_raw_pixel_line(data);
 	}
 
-	void writer::write_raw_pixel_line(const bayer_grbg* data)
+	void Writer::write_raw_pixel_line(const bayer_rggb* data)
 	{
 		t->write_raw_pixel_line(data);
 	}
 
-	void writer::write_raw_pixel_line(const bayer_gbrg* data)
+	void Writer::write_raw_pixel_line(const bayer_grbg* data)
 	{
 		t->write_raw_pixel_line(data);
 	}
 
-	void writer::write_raw_pixel_line(const Rgb<byte>* data)
+	void Writer::write_raw_pixel_line(const bayer_gbrg* data)
 	{
 		t->write_raw_pixel_line(data);
 	}
 
-	void writer::write_raw_pixel_line(const Rgba<byte>* data)
+	void Writer::write_raw_pixel_line(const Rgb<byte>* data)
+	{
+		t->write_raw_pixel_line(data);
+	}
+
+	void Writer::write_raw_pixel_line(const Rgba<byte>* data)
 	{
 		t->write_raw_pixel_line(data);
 	}

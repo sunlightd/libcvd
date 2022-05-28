@@ -21,6 +21,10 @@ class CVD::FITS::WritePimpl
 	public:
 	WritePimpl(ostream&, ImageRef size, const string& t);
 	~WritePimpl();
+	WritePimpl(const WritePimpl&) = delete;
+	WritePimpl(WritePimpl&&) = delete;
+	WritePimpl& operator=(const WritePimpl&) = delete;
+	WritePimpl& operator=(WritePimpl&&) = delete;
 
 	template <class C>
 	void write_raw_pixel_line(const C* data);
@@ -236,19 +240,19 @@ WritePimpl::~WritePimpl()
 // Implementation of public parts of FITS reading
 //
 
-CVD::FITS::writer::writer(ostream& o, ImageRef size, const string& type, const map<string, Parameter<>>&)
+CVD::FITS::Writer::Writer(ostream& o, ImageRef size, const string& type, const map<string, Parameter<>>&)
     : t(new WritePimpl(o, size, type))
 {
 }
 
-CVD::FITS::writer::~writer()
+CVD::FITS::Writer::~Writer()
 {
 	delete t;
 }
 
 //Mechanically generate the pixel reading calls.
 #define GEN1(X) \
-	void CVD::FITS::writer::write_raw_pixel_line(const X* d) { t->write_raw_pixel_line(d); }
+	void CVD::FITS::Writer::write_raw_pixel_line(const X* d) { t->write_raw_pixel_line(d); }
 #define GEN3(X)  \
 	GEN1(X)      \
 	GEN1(Rgb<X>) \

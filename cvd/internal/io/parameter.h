@@ -72,8 +72,12 @@ class Parameter<void>
 	Parameter(const Parameter& p)
 	{
 		if(p.param.get())
-			std::unique_ptr<Parameter<Internal::UntypedParameter>>(p.param->duplicate());
+		{
+			std::unique_ptr<Parameter<Internal::UntypedParameter>> pp(p.param->duplicate());
+		}
 	}
+
+	Parameter& operator=(const Parameter&) = delete;
 
 	template <class C>
 	Parameter(const Parameter<C>& p)

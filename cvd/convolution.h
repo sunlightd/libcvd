@@ -572,8 +572,8 @@ void convolveGaussian(const BasicImage<T>& I, BasicImage<T>& out, double sigma, 
 			{
 				for(int r = 0; r < ksize; r++)
 				{
-					const sum_type* middle_row = rows[ksize + r + 1];
-					assign_multiple(middle_row, factor, outbuf, w);
+					const sum_type* middle_row_r = rows[ksize + r + 1];
+					assign_multiple(middle_row_r, factor, outbuf, w);
 					for(int k = 0; k < ksize; k++)
 					{
 						const sum_comp_type m = kernel[k];

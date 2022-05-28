@@ -30,6 +30,10 @@ namespace FITS
 		public:
 		Reader(std::istream&);
 		~Reader();
+		Reader(const Reader&) = delete;
+		Reader(Reader&&) = delete;
+		Reader& operator=(const Reader&) = delete;
+		Reader& operator=(Reader&&) = delete;
 
 		ImageRef size();
 		bool top_row_first();
@@ -175,11 +179,15 @@ namespace FITS
 
 	class WritePimpl;
 
-	class writer
+	class Writer
 	{
 		public:
-		writer(std::ostream&, ImageRef size, const std::string& type, const std::map<std::string, Parameter<>>& p);
-		~writer();
+		Writer(std::ostream&, ImageRef size, const std::string& type, const std::map<std::string, Parameter<>>& p);
+		~Writer();
+		Writer(const Writer&) = delete;
+		Writer(Writer&&) = delete;
+		Writer& operator=(const Writer&) = delete;
+		Writer& operator=(Writer&&) = delete;
 
 		void write_raw_pixel_line(const unsigned char*);
 		void write_raw_pixel_line(const short*);

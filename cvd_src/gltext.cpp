@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cmath>
 #include <map>
+#include <stdexcept>
 
 using namespace std;
 
@@ -151,7 +152,7 @@ std::pair<double, double> glDrawText(const std::string& text, enum TEXT_STYLE st
 			operation = &Internal::Font::draw;
 			break;
 		default:
-			assert(false);
+			throw std::invalid_argument("unknown style");
 	}
 
 	int lines = 0;

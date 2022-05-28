@@ -486,19 +486,19 @@ WriterPimpl::~WriterPimpl()
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 }
 
-png_writer::png_writer(std::ostream& o, ImageRef size, const std::string& type, const std::map<std::string, Parameter<>>&)
+Writer::Writer(std::ostream& o, ImageRef size, const std::string& type, const std::map<std::string, Parameter<>>&)
     : p(new WriterPimpl(o, size, type))
 {
 }
 
-png_writer::~png_writer()
+Writer::~Writer()
 {
 }
 //Mechanically generate the pixel writing calls.
 #undef GEN1
 #undef GEN3
 #define GEN1(X) \
-	void png_writer::write_raw_pixel_line(const X* d) { p->write_line(d); }
+	void Writer::write_raw_pixel_line(const X* d) { p->write_line(d); }
 #define GEN3(X)  \
 	GEN1(X)      \
 	GEN1(Rgb<X>) \
